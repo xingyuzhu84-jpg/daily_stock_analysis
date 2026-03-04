@@ -17,6 +17,14 @@ on:
           - full          # 完整分析（股票+大盘）
           - market-only   # 仅大盘复盘
           - stocks-only   # 仅股票分析
+      stock_list_type:
+        description: '股票池类型'
+        required: true
+        default: 'simulation'
+        type: choice
+        options:
+          - simulation    # 模拟盘（STOCK_LIST）
+          - temporary     # 临时需求（TEMP_STOCK_LIST）
       force_run:
         description: '强制运行（跳过交易日检查）'
         required: false
@@ -144,7 +152,7 @@ jobs:
           # ==========================================
           # 自选股配置
           # ==========================================
-          STOCK_LIST: ${{ vars.STOCK_LIST || secrets.STOCK_LIST || '600519' }}
+          STOCK_LIST: ${{ github.event.inputs.stock_list_type == 'temporary' && vars.TEMP_STOCK_LIST || vars.STOCK_LIST }}
           MARKET_REVIEW_REGION: ${{ vars.MARKET_REVIEW_REGION || secrets.MARKET_REVIEW_REGION || 'cn' }}
           
           # ==========================================
@@ -247,3 +255,4 @@ jobs:
             echo "📜 最近日志（最后 30 行）:"
             tail -30 logs/stock_analysis_*.log 2>/dev/null || echo "无日志"
           fi
+
